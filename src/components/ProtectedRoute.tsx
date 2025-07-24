@@ -1,6 +1,7 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from './AuthProvider'
 import { AuthUser, requireAuth } from '@/lib/auth'
 import { LoadingPage } from './LoadingSpinner'
@@ -26,20 +27,22 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   loadingFallback = <LoadingPage />
 }) => {
   const { user, loading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    // If not loading and no user, redirect to login page
+    if (!loading && !user) {
+      router.push('/login')
+    }
+  }, [user, loading, router])
 
   if (loading) {
     return <>{loadingFallback}</>
   }
 
   if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Authentication Required</h1>
-          <p className="text-gray-600">Please log in to access this page.</p>
-        </div>
-      </div>
-    )
+    // Return null while redirecting to login
+    return null
   }
 
   if (requiredRoles && !requireAuth(user, requiredRoles)) {

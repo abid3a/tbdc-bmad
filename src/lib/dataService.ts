@@ -80,4 +80,4 @@ class MockDataService implements DataService {
 export const dataService = new MockDataService()
 
 // Export types for use in components
-export type { MockSession, MockCompany } 
+export type { MockSession, MockCompany } from './mockData' 

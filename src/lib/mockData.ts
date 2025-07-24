@@ -42,10 +42,18 @@ class MockDataStore {
   private sessions: MockSession[] = []
   private companies: MockCompany[] = []
   private currentUser: AuthUser | null = null
+  private initialized = false
 
   constructor() {
-    this.initializeMockData()
-    this.loadFromLocalStorage()
+    // Don't initialize immediately - wait for client-side
+  }
+
+  private ensureInitialized() {
+    if (!this.initialized && typeof window !== 'undefined') {
+      this.initializeMockData()
+      this.loadFromLocalStorage()
+      this.initialized = true
+    }
   }
 
   private initializeMockData() {
@@ -149,6 +157,7 @@ class MockDataStore {
 
   // Authentication methods
   async signInWithPassword(email: string, password: string) {
+    this.ensureInitialized()
     const user = this.users.find(u => u.email === email && u.password === password)
     
     if (!user) {
@@ -184,6 +193,7 @@ class MockDataStore {
   }
 
   async signUp(email: string, password: string, userData: Partial<AuthUser>) {
+    this.ensureInitialized()
     // Check if user already exists
     if (this.users.find(u => u.email === email)) {
       return {
@@ -218,12 +228,14 @@ class MockDataStore {
   }
 
   async signOut() {
+    this.ensureInitialized()
     this.currentUser = null
     this.saveToLocalStorage()
     return { error: null }
   }
 
   async getSession() {
+    this.ensureInitialized()
     if (!this.currentUser) {
       return { data: { session: null }, error: null }
     }
@@ -243,6 +255,7 @@ class MockDataStore {
   }
 
   async getUser() {
+    this.ensureInitialized()
     if (!this.currentUser) {
       return { data: { user: null }, error: null }
     }
@@ -252,6 +265,7 @@ class MockDataStore {
 
   // Data methods
   async getSessions(cohort?: string) {
+    this.ensureInitialized()
     let filteredSessions = this.sessions
 
     if (cohort) {
@@ -262,10 +276,12 @@ class MockDataStore {
   }
 
   async getCompanies() {
+    this.ensureInitialized()
     return { data: this.companies, error: null }
   }
 
   async createSession(sessionData: Omit<MockSession, 'id' | 'created_at' | 'updated_at'>) {
+    this.ensureInitialized()
     const newSession: MockSession = {
       ...sessionData,
       id: Date.now().toString(),
@@ -280,6 +296,7 @@ class MockDataStore {
   }
 
   async updateSession(id: string, updates: Partial<MockSession>) {
+    this.ensureInitialized()
     const sessionIndex = this.sessions.findIndex(s => s.id === id)
     if (sessionIndex === -1) {
       return { data: null, error: { message: 'Session not found', name: 'NotFound' } }
@@ -296,6 +313,7 @@ class MockDataStore {
   }
 
   async deleteSession(id: string) {
+    this.ensureInitialized()
     const sessionIndex = this.sessions.findIndex(s => s.id === id)
     if (sessionIndex === -1) {
       return { error: { message: 'Session not found', name: 'NotFound' } }

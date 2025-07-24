@@ -38,23 +38,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
 
     getInitialSession()
-
-    // For mock data, we'll check for auth changes periodically
-    const interval = setInterval(async () => {
-      try {
-        const { data: { session } } = await mockDataStore.getSession()
-        setSession(session)
-        setUser(session?.user || null)
-      } catch (error) {
-        console.error('Error checking auth state:', error)
-      }
-    }, 1000) // Check every second
-
-    return () => clearInterval(interval)
   }, [])
 
   const handleSignIn = async (email: string, password: string) => {
-    return await signIn(email, password)
+    const result = await signIn(email, password)
+    if (!result.error) {
+      // Update the user state after successful sign in
+      const { data: { session } } = await mockDataStore.getSession()
+      setSession(session)
+      setUser(session?.user || null)
+    }
+    return result
   }
 
   const handleSignUp = async (email: string, password: string, userData: Partial<AuthUser>) => {
@@ -65,7 +59,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const { error } = await signOut()
     if (error) {
       console.error('Error signing out:', error.message)
+    } else {
+      // Clear the user and session state
+      setUser(null)
+      setSession(null)
     }
+    return { error }
   }
 
   const value: AuthContextType = {

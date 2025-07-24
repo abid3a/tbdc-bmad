@@ -2,14 +2,12 @@
 
 import { useAuth } from '@/components/AuthProvider'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
-import { LoadingPage } from '@/components/LoadingSpinner'
-import { LoginForm } from '@/components/LoginForm'
 import { dataService } from '@/lib/dataService'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
 export default function Home() {
-  const { user, loading } = useAuth()
+  const { user } = useAuth()
   const [sessionCount, setSessionCount] = useState(0)
   const [companyCount, setCompanyCount] = useState(0)
 
@@ -25,52 +23,21 @@ export default function Home() {
     loadData()
   }, [user])
 
-  if (loading) {
-    return <LoadingPage />
-  }
-
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-2xl mb-6">
-              <span className="text-2xl">🚀</span>
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to Horizon</h1>
-            <p className="text-gray-600">Sign in to access your workspace</p>
-          </div>
-          
-          <div className="card">
-            <div className="card-body">
-              <LoginForm />
-            </div>
-          </div>
-          
-          <div className="mt-6 text-center">
-            <p className="text-xs text-gray-500">
-              This application uses mock data stored in localStorage for demonstration purposes.
-            </p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <ProtectedRoute>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Hero Section */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                Welcome back, {user.email?.split('@')[0]}!
-              </h1>
-              <p className="text-xl text-gray-600">
-                You're logged in as a <span className="font-semibold capitalize">{user.role}</span>
-              </p>
-            </div>
+      {user && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Hero Section */}
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                  Welcome back, {user.email?.split('@')[0]}!
+                </h1>
+                <p className="text-xl text-gray-600">
+                  You're logged in as a <span className="font-semibold capitalize">{user.role}</span>
+                </p>
+              </div>
             <div className="hidden md:flex items-center space-x-3">
               <Link href="/sessions" className="btn-primary">
                 View Sessions
@@ -256,6 +223,7 @@ export default function Home() {
           </div>
         </div>
       </div>
+      )}
     </ProtectedRoute>
   )
 }

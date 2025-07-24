@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from './AuthProvider'
 
 export const LoginForm = () => {
@@ -9,6 +10,7 @@ export const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const { signIn } = useAuth()
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -19,6 +21,9 @@ export const LoginForm = () => {
       const { error } = await signIn(email, password)
       if (error) {
         setError(error.message)
+      } else {
+        // Redirect to home page on successful login
+        router.push('/')
       }
     } catch (err) {
       setError('An unexpected error occurred')
@@ -27,9 +32,25 @@ export const LoginForm = () => {
     }
   }
 
-  const handleQuickLogin = (email: string, password: string) => {
+  const handleQuickLogin = async (email: string, password: string) => {
     setEmail(email)
     setPassword(password)
+    setIsLoading(true)
+    setError('')
+
+    try {
+      const { error } = await signIn(email, password)
+      if (error) {
+        setError(error.message)
+      } else {
+        // Redirect to home page on successful login
+        router.push('/')
+      }
+    } catch (err) {
+      setError('An unexpected error occurred')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
