@@ -1,5 +1,5 @@
 // Data service for accessing mock data throughout the application
-import { mockDataStore, MockSession, MockCompany } from './mockData'
+import { mockDataStore, MockSession, MockCompany, MockSurgeService, MockMeeting } from './mockData'
 
 export interface DataService {
   // Session methods
@@ -12,6 +12,20 @@ export interface DataService {
   // Company methods
   getCompanies: () => Promise<{ data: MockCompany[]; error: any }>
   getCompany: (id: string) => Promise<{ data: MockCompany | null; error: any }>
+
+  // Surge Services methods
+  getSurgeServices: (category?: string) => Promise<{ data: MockSurgeService[]; error: any }>
+  getSurgeService: (id: string) => Promise<{ data: MockSurgeService | null; error: any }>
+  createSurgeService: (serviceData: Omit<MockSurgeService, 'id' | 'created_at' | 'updated_at'>) => Promise<{ data: MockSurgeService | null; error: any }>
+  updateSurgeService: (id: string, updates: Partial<MockSurgeService>) => Promise<{ data: MockSurgeService | null; error: any }>
+  deleteSurgeService: (id: string) => Promise<{ error: any }>
+
+  // Meeting methods
+  getMeetings: (status?: string) => Promise<{ data: MockMeeting[]; error: any }>
+  getMeeting: (id: string) => Promise<{ data: MockMeeting | null; error: any }>
+  createMeeting: (meetingData: Omit<MockMeeting, 'id' | 'created_at' | 'updated_at'>) => Promise<{ data: MockMeeting | null; error: any }>
+  updateMeeting: (id: string, updates: Partial<MockMeeting>) => Promise<{ data: MockMeeting | null; error: any }>
+  deleteMeeting: (id: string) => Promise<{ error: any }>
 
   // Utility methods
   clearAllData: () => void
@@ -59,12 +73,56 @@ class MockDataService implements DataService {
     }
   }
 
+  // Surge Services methods
+  async getSurgeServices(category?: string) {
+    return await mockDataStore.getSurgeServices(category)
+  }
+
+  async getSurgeService(id: string) {
+    return await mockDataStore.getSurgeService(id)
+  }
+
+  async createSurgeService(serviceData: Omit<MockSurgeService, 'id' | 'created_at' | 'updated_at'>) {
+    return await mockDataStore.createSurgeService(serviceData)
+  }
+
+  async updateSurgeService(id: string, updates: Partial<MockSurgeService>) {
+    return await mockDataStore.updateSurgeService(id, updates)
+  }
+
+  async deleteSurgeService(id: string) {
+    return await mockDataStore.deleteSurgeService(id)
+  }
+
+  // Meeting methods
+  async getMeetings(status?: string) {
+    return await mockDataStore.getMeetings(status)
+  }
+
+  async getMeeting(id: string) {
+    return await mockDataStore.getMeeting(id)
+  }
+
+  async createMeeting(meetingData: Omit<MockMeeting, 'id' | 'created_at' | 'updated_at'>) {
+    return await mockDataStore.createMeeting(meetingData)
+  }
+
+  async updateMeeting(id: string, updates: Partial<MockMeeting>) {
+    return await mockDataStore.updateMeeting(id, updates)
+  }
+
+  async deleteMeeting(id: string) {
+    return await mockDataStore.deleteMeeting(id)
+  }
+
   // Utility methods
   clearAllData() {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('mock_users')
       localStorage.removeItem('mock_companies')
       localStorage.removeItem('mock_sessions')
+      localStorage.removeItem('mock_surge_services')
+      localStorage.removeItem('mock_meetings')
       localStorage.removeItem('mock_current_user')
       // Reload the page to reinitialize with default data
       window.location.reload()
@@ -80,4 +138,4 @@ class MockDataService implements DataService {
 export const dataService = new MockDataService()
 
 // Export types for use in components
-export type { MockSession, MockCompany } from './mockData' 
+export type { MockSession, MockCompany, MockSurgeService, MockMeeting } from './mockData' 

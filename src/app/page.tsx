@@ -10,14 +10,20 @@ export default function Home() {
   const { user } = useAuth()
   const [sessionCount, setSessionCount] = useState(0)
   const [companyCount, setCompanyCount] = useState(0)
+  const [surgeServicesCount, setSurgeServicesCount] = useState(0)
+  const [meetingCount, setMeetingCount] = useState(0)
 
   useEffect(() => {
     const loadData = async () => {
       if (user) {
         const { data: sessions } = await dataService.getSessions()
         const { data: companies } = await dataService.getCompanies()
+        const { data: surgeServices } = await dataService.getSurgeServices()
+        const { data: meetings } = await dataService.getMeetings()
         setSessionCount(sessions.length)
         setCompanyCount(companies.length)
+        setSurgeServicesCount(surgeServices.length)
+        setMeetingCount(meetings.length)
       }
     }
     loadData()
@@ -93,7 +99,7 @@ export default function Home() {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Active Meetings</p>
-                  <p className="text-2xl font-bold text-gray-900">0</p>
+                  <p className="text-2xl font-bold text-gray-900">{meetingCount}</p>
                 </div>
               </div>
             </div>
@@ -109,7 +115,7 @@ export default function Home() {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Surge Services</p>
-                  <p className="text-2xl font-bold text-gray-900">12</p>
+                  <p className="text-2xl font-bold text-gray-900">{surgeServicesCount}</p>
                 </div>
               </div>
             </div>
